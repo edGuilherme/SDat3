@@ -1,0 +1,260 @@
+openapi: 3.0.3
+info:
+  title: Cat Facts API
+  version: 1.0.0
+  description: An API for managing and retrieving cat facts
+
+servers:
+  - url: https://api.example.com/v1
+
+paths:
+  /catfacts:
+    get:
+      summary: Get all cat facts
+      description: Retrieve a list of all cat facts
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatFact'
+            application/xml:
+              schema:
+                type: object
+                xml:
+                  name: catFacts
+                properties:
+                  catFact:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CatFact'
+            application/x-protobuf:
+              schema:
+                type: string
+                format: binary
+    post:
+      summary: Add a new cat fact
+      description: Add a new cat fact to the collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCatFact'
+      responses:
+        '201':
+          description: Cat fact added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatFactResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CatFactResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /catfacts/{id}:
+    put:
+      summary: Update a cat fact
+      description: Update an existing cat fact by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCatFact'
+      responses:
+        '200':
+          description: Cat fact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatFactResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CatFactResponse'
+        '404':
+          description: Cat fact not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a cat fact
+      description: Delete an existing cat fact by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cat fact deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatFactResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CatFactResponse'
+        '404':
+          description: Cat fact not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /catfacts/{id}/vote:
+    post:
+      summary: Vote for a cat fact
+      description: Add a vote to an existing cat fact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vote added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/VoteResponse'
+        '404':
+          description: Cat fact not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /catfacts/popular:
+    get:
+      summary: Get the most popular cat fact
+      description: Retrieve the cat fact with the most votes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatFact'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CatFact'
+        '404':
+          description: No cat facts available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CatFact:
+      type: object
+      properties:
+        _id:
+          type: string
+        status:
+          type: object
+          properties:
+            verified:
+              type: boolean
+            sentCount:
+              type: integer
+        user:
+          type: string
+        text:
+          type: string
+        __v:
+          type: integer
+        source:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        type:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+        used:
+          type: boolean
+        votes:
+          type: integer
+
+    NewCatFact:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+
+    UpdateCatFact:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+
+    CatFactResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        catFacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatFact'
+
+    VoteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        fact:
+          $ref: '#/components/schemas/CatFact'
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
